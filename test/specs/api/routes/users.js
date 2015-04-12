@@ -21,29 +21,29 @@ describe( 'User Resource - /api/routes/users', function () {
 		expect( table ).to.have.length.above( 0 );
 	} );
 
-	describe( 'GET users - routes', function () {
-		it( 'returns all the users', function ( done ) {
-			var options = {
-				'method' : 'GET',
-				'url'    : '/users'
-			};
+	// describe( 'GET users - routes', function () {
+	// 	it( 'returns all the users', function ( done ) {
+	// 		var options = {
+	// 			'method' : 'GET',
+	// 			'url'    : '/users'
+	// 		};
 
-			// simulate server
-			server.inject( options, function ( res ) {
-				var body;
+	// 		// simulate server
+	// 		server.inject( options, function ( res ) {
+	// 			var body;
 
-				try {
-					body = JSON.parse( res.payload );
-				}catch ( e ) {
-					body = 'can\'t parse it...';
-				}
+	// 			try {
+	// 				body = JSON.parse( res.payload );
+	// 			}catch ( e ) {
+	// 				body = 'can\'t parse it...';
+	// 			}
 
-				expect( res.statusCode ).to.equal( 200 );
-				expect( body ).to.be.a( 'array' );
-				expect( body ).to.have.length.above( 0 );
+	// 			expect( res.statusCode ).to.equal( 200 );
+	// 			expect( body ).to.be.a( 'array' );
+	// 			expect( body ).to.have.length.above( 0 );
 
-				done();
-			} );
-		} );
-	} );
+	// 			done();
+	// 		} );
+	// 	} );
+	// } );
 } );

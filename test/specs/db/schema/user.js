@@ -2,7 +2,7 @@
 
 var expect = require( 'chai' ).expect;
 var appDir = process.cwd();
-var user   = require( appDir + '/db/schema/User' );
+var user   = require( appDir + '/db/schema/user' );
 
 describe( 'DB schema - /db/schema', function () {
 	describe( 'User schema', function () {
