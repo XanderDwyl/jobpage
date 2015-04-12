@@ -1,0 +1,16 @@
+{
+	"server" : {
+		"host" : "localhost",
+		"port" : 3000
+	},
+	"mongo" : {
+		"host"     : "localhost",
+		"port"     : 27017,
+		"username" : "",
+		"password" : "",
+		"database" : "jobapi"
+	},
+	"option" : {
+		"cors" : true
+	}
+}
