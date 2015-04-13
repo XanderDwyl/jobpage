@@ -7,19 +7,30 @@ var _error = Hapi.error;
 
 module.exports = [
 	{
-		'method' : 'GET',
-		'path'   : '/v1/users',
+		'method'  : 'GET',
+		'path'    : '/v1/users',
+		'handler' : function ( request, reply ) {
+			var user = {
+				'email' : 'sample',
+				'meta'  : {
+					'firstname' : 'sample',
+					'lastname'  : 'elpmas'
+				}
+			};
 
-		handler : function ( request, reply ) {
+			reply( user );
 
-			reply( 'get users' );
+		},
 
+		'config' : {
+			'description' : 'Display all users.',
+			'tags'        : [ 'api', 'user' ]
 		}
 	},
 
 	{
-		method : 'POST',
-		path   : '/v1/users',
+		'method' : 'POST',
+		'path'   : '/v1/users',
 
 		handler : function ( request, reply ) {
 
@@ -34,6 +45,19 @@ module.exports = [
 
 			var newUser = new User( credentials );
 
+			newUser.save( function ( error, user ) {
+				console.log( error.message );
+				if ( error ) {
+					var message = 'Registration problem. Try again later.';
+
+					if ( error.message.match( /duplicate/i ) ) {
+						message = 'Email already registered.';
+					}
+
+					var err = _error.badRequest( message );
+					return reply( err );
+				}
+			} );
 			reply( 'add user' );
 
 		}

@@ -12,6 +12,8 @@ describe( 'User Resource - /api/routes/users', function () {
 				.Server()
 				.connection( util.config( 'server' ) );
 
+	util.models();
+
 	var userResource = require( appDir + '/api/routes/users' );
 	server.route( userResource );
 
@@ -20,22 +22,42 @@ describe( 'User Resource - /api/routes/users', function () {
 
 		expect( table ).to.have.length.above( 0 );
 	} );
+	describe( 'GET users - routes', function () {
+		it( 'display all the users', function ( done ) {
+			var options = {
+				'method' : 'GET',
+				'url'    : 'v1/users'
+			};
 
-	// describe( 'GET users - routes', function () {
-	// 	it( 'returns all the users', function ( done ) {
+			server.inject( options, function ( res ) {
+				var body;
+
+				try {
+					body = JSON.parse( res.payload );
+				}catch ( err ) {
+					body = err;
+				}
+
+				expect( res.statusCode ).to.equal( 200 );
+			} );
+
+			done();
+		} );
+	} );
+	// describe( 'POST users - routes', function () {
+	// 	it( 'add new user', function ( done ) {
 	// 		var options = {
 	// 			'method' : 'GET',
 	// 			'url'    : '/users'
 	// 		};
 
-	// 		// simulate server
 	// 		server.inject( options, function ( res ) {
 	// 			var body;
 
 	// 			try {
 	// 				body = JSON.parse( res.payload );
-	// 			}catch ( e ) {
-	// 				body = 'can\'t parse it...';
+	// 			}catch ( err ) {
+	// 				body = err;
 	// 			}
 
 	// 			expect( res.statusCode ).to.equal( 200 );

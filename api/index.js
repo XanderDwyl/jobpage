@@ -1,5 +1,6 @@
 'use strict';
-var _ = require( 'lodash' );
+var _    = require( 'lodash' );
+var pack = require('../package');
 
 // add your routes here
 var routes = _.union(
@@ -13,5 +14,5 @@ exports.register = function ( plugin, options, next ) {
 
 exports.register.attributes = {
 	'name'    : 'api',
-	'version' : '1.0'
+	'version' : pack.version
 };

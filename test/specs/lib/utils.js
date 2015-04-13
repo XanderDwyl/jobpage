@@ -1,7 +1,6 @@
 'use strict';
 
 var Hapi     = require( 'hapi' );
-var crypto   = require( 'crypto' );
 var mongoose = require( 'mongoose' );
 var expect   = require( 'chai' ).expect;
 var appDir   = process.cwd();
@@ -41,10 +40,8 @@ describe( '/lib/utils', function () {
 
 		it( 'registers a plugin without a problem', function ( done ) {
 			util.models();
+			server.register( util.plugins(), done );
 
-			server.register( {
-				'register' : require( appDir + '/api/' )
-			}, done );
 		} );
 		it( 'adds all the plugin routes to the table', function () {
 			var table = server.table()[ 0 ].table;
@@ -54,20 +51,18 @@ describe( '/lib/utils', function () {
 
 	describe( 'Config generateToken', function () {
 		it( 'should generateToken without problem', function ( ) {
-			var tempToken = crypto.createHash( 'sha1' ).update( Date.now().toString() ).digest( 'hex' );
-			var token     = util.generateToken();
+			var token = util.generateToken();
 
-			expect( token ).to.equal( tempToken );
+			expect( token ).to.be.a( 'string' );
 		} );
 	} );
 
 	describe( 'Config generateHash', function () {
 		it( 'should generateToken without problem', function ( ) {
-			var tempStr  = 'sample';
-			var tempHash = crypto.createHash( 'md5' ).update( tempStr + Date.now().toString() ).digest( 'hex' );
-			var hash     = util.generateHash( tempStr );
+			var tempStr = 'sample';
+			var hash    = util.generateHash( tempStr );
 
-			expect( hash ).to.equal( tempHash );
+			expect( hash ).to.be.a( 'string' );
 		} );
 	} );
 

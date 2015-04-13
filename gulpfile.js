@@ -1,11 +1,12 @@
 'use strict';
 
-var gulp    = require( 'gulp' );
-var jshint  = require( 'gulp-jshint' );
-var eslint  = require( 'gulp-eslint' );
-var stylish = require( 'jshint-stylish' );
-var mocha   = require( 'gulp-mocha' );
-var exit    = require( 'gulp-exit' );
+var gulp     = require( 'gulp-param' )( require( 'gulp' ), process.argv );
+var jshint   = require( 'gulp-jshint' );
+var eslint   = require( 'gulp-eslint' );
+var stylish  = require( 'jshint-stylish' );
+var mocha    = require( 'gulp-mocha' );
+var coverage = require( 'gulp-coverage' );
+var exit     = require( 'gulp-exit' );
 
 gulp.task( 'jslint', function () {
 	return gulp.src( [ './*.js', './test/**/*.js' ] )
@@ -21,12 +22,19 @@ gulp.task( 'eslint', function () {
 		.pipe( eslint.failOnError() );
 } );
 
-gulp.task( 'test', [ 'jslint', 'eslint' ], function ( ) {
-	/**
-	 * Set `read` to false so gulp passes the file
-	 * references straight to mocha without reading
-	 * them. This will help speed things up.
-	 */
+gulp.task( 'test', [ 'jslint', 'eslint' ], function ( pathSource, dontExit ) {
+
+	var sourceFile  = './test/**/*.js';
+	var processExit = '';
+
+	if ( pathSource ) {
+		sourceFile = pathSource;
+	}
+
+	if ( !dontExit ) {
+		processExit = exit();
+	}
+
 	return gulp.src( './test/**/*.js', {
 			'read' : false,
 			'base' : '/'
@@ -36,5 +44,23 @@ gulp.task( 'test', [ 'jslint', 'eslint' ], function ( ) {
 				'reporter' : 'spec'
 			} )
 		)
-		.pipe( exit() );
+		.pipe( coverage.instrument( {
+			'pattern'        : [ './api/**/*.js', './db/**/*.js', './lib/**/*.js' ],
+			'debugDirectory' : 'debug'
+		} ) )
+		.pipe( coverage.gather() )
+		.pipe( coverage.format( [ {
+			'reporter' : 'html',
+			'outFile'  : 'coverage.html'
+		} ] ) )
+		.pipe( gulp.dest( 'reports' ) )
+		.pipe( processExit );
+
+} );
+
+gulp.task( 'watch', function () {
+	gulp.watch( [ './test/**/*.js', 'gulpfile.js' ], function ( event ) {
+		console.log( 'File ' + event.path + ' was  ' + event.type + ', running tasks...' );
+		gulp.start( 'test --dontExit true' );
+	} );
 } );

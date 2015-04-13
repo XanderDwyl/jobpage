@@ -3,6 +3,7 @@
 var Hapi     = require( 'hapi' );
 var mongoose = require( 'mongoose' );
 var util     = require( './lib/utils' );
+
 var server   = new Hapi.Server();
 
 var _error = Hapi.error;
@@ -17,7 +18,14 @@ server.connection( util.config( 'server' ) );
 util.models();
 
 // register server and start server
-server.register( util.plugins(), function ( ) {
+server.register( util.plugins(), function ( swagError ) {
+
+	if ( swagError ) {
+		console.log( [ 'error' ], 'hapi-swagger load error: ' + swagError );
+	} else {
+		console.log( [ 'start' ], 'hapi-swagger interface loaded' );
+	}
+
 	var start = function ( err ) {
 		if ( err ) {
 			return _error.badRequest( 'Unable to start server.' );
@@ -27,4 +35,5 @@ server.register( util.plugins(), function ( ) {
 	};
 
 	server.start( start );
+
 } );
