@@ -7,6 +7,10 @@ node_js:
 services:
   - mongodb
 
+branches:
+  only:
+    - master
+
 install: npm install
 
 script: npm test

@@ -33,13 +33,17 @@ module.exports = [
 		'path'    : '/v1/users/{id}',
 		'handler' : function ( request, reply ) {
 
+
 			User.findById( request.params.id, function ( err, users ) {
 				if ( err ) {
 					return reply( err );
 				}
 
 				if ( !users ) {
-					return reply( err ).code( 400 );
+					return reply( {
+						'statusCode' : 200,
+						'message'    : 'User not found.'
+					} );
 				}
 
 				reply( users );
@@ -89,7 +93,7 @@ module.exports = [
 					return reply( {
 						'msg'        : message,
 						'subMsg'     : subMsg,
-						'statusCode' : 400
+						'statusCode' : 200
 					} );
 				}
 

@@ -2,9 +2,9 @@
 
 var Hapi     = require( 'hapi' );
 var expect   = require( 'chai' ).expect;
-// var sinon    = require( 'sinon' );
-// var mongoose = require( 'mongoose' );
-// var User     = mongoose.model( 'User' );
+var sinon    = require( 'sinon' );
+var mongoose = require( 'mongoose' );
+var User     = mongoose.model( 'User' );
 var appDir   = process.cwd();
 var util     = require( appDir + '/lib/utils' );
 
@@ -84,7 +84,7 @@ describe( 'User Resource - /api/routes/users', function () {
 
 					body = JSON.parse( res.payload );
 
-					expect( body.statusCode ).to.equal( 400 );
+					expect( body.statusCode ).to.equal( 200 );
 					expect( body.msg ).to.equal( 'Email already registered.' );
 
 					done();
@@ -108,7 +108,7 @@ describe( 'User Resource - /api/routes/users', function () {
 				server.inject( options, function ( res ) {
 					body = JSON.parse( res.payload );
 
-					expect( body.statusCode ).to.equal( 400 );
+					expect( body.statusCode ).to.equal( 200 );
 					expect( body.msg ).to.equal( 'User validation failed' );
 					expect( body.subMsg[ 0 ] ).to.equal( 'Path `email` is invalid (' + inputedEmail + ').' );
 
@@ -133,7 +133,7 @@ describe( 'User Resource - /api/routes/users', function () {
 				server.inject( options, function ( res ) {
 					body = JSON.parse( res.payload );
 
-					expect( body.statusCode ).to.equal( 400 );
+					expect( body.statusCode ).to.equal( 200 );
 					expect( body.msg ).to.equal( 'User validation failed' );
 					expect( body.subMsg[ 0 ] ).to.equal( 'Path `password` is invalid (' + inputedPassword + ').' );
 
@@ -146,36 +146,90 @@ describe( 'User Resource - /api/routes/users', function () {
 	} );
 
 	describe( 'GET users - routes', function () {
-		it( 'returns all users', function ( done ) {
-			var options = {
-				'method' : 'GET',
-				'url'    : '/v1/users'
-			};
+		describe( 'all users', function () {
+			it( 'returns all users', function ( done ) {
+				var options = {
+					'method' : 'GET',
+					'url'    : '/v1/users'
+				};
 
-			server.inject( options, function ( res ) {
-				var body = JSON.parse( res.payload );
+				server.inject( options, function ( res ) {
+					var body = JSON.parse( res.payload );
 
-				expect( res.statusCode ).to.equal( 200 );
-				expect( body ).to.be.a( 'array' );
+					expect( res.statusCode ).to.equal( 200 );
+					expect( body ).to.be.a( 'array' );
 
-				done();
+					done();
+				} );
+			} );
+			it( 'expect to return An internal server error occurred', function ( done ) {
+				sinon.stub( User, 'find', function ( callback ) {
+					callback( new Error( 'Internal Server Error' ) );
+				} );
+
+				var options = {
+					'method' : 'GET',
+					'url'    : '/v1/users'
+				};
+
+				server.inject( options, function ( res ) {
+					User.find.restore();
+
+					expect( res.result.statusCode ).to.equal( 500 );
+					expect( res.result.error ).to.equal( 'Internal Server Error' );
+
+					done();
+				} );
 			} );
 		} );
-		it( 'returns a single user', function ( done ) {
-			var _id = insertedId;
+		describe( 'single users', function () {
+			it( 'returns single user', function ( done ) {
 
-			var options = {
-				'method' : 'GET',
-				'url'    : '/v1/users/' + _id
-			};
+				var options = {
+					'method' : 'GET',
+					'url'    : '/v1/users/' + insertedId
+				};
 
-			server.inject( options, function ( res ) {
-				var body = JSON.parse( res.payload );
+				server.inject( options, function ( res ) {
+					var body = JSON.parse( res.payload );
 
-				expect( res.statusCode ).to.equal( 200 );
-				expect( body ).to.be.a( 'object' );
+					expect( res.statusCode ).to.equal( 200 );
+					expect( body ).to.be.a( 'object' );
 
-				done();
+					done();
+				} );
+			} );
+			it( 'expect to return User not found', function ( done ) {
+
+				var options = {
+					'method' : 'GET',
+					'url'    : '/v1/users/552f45bd47bf18977268e1e3'
+				};
+
+				server.inject( options, function ( res ) {
+
+					expect( res.result.statusCode ).to.equal( 200 );
+					expect( res.result.message ).to.equal( 'User not found.' );
+
+					done();
+				} );
+			} );
+			it( 'expect to return An internal server error occurred', function ( done ) {
+
+				var id = ( insertedId + 1 );
+
+				var options = {
+					'method' : 'GET',
+					'url'    : '/v1/users/' + id
+				};
+
+				server.inject( options, function ( res ) {
+
+					expect( res.result.statusCode ).to.equal( 500 );
+					expect( res.result.error ).to.equal( 'Internal Server Error' );
+
+					done();
+				} );
 			} );
 		} );
 	} );
