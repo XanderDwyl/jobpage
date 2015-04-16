@@ -4,7 +4,11 @@ var Hapi     = require( 'hapi' );
 var mongoose = require( 'mongoose' );
 var util     = require( './lib/utils' );
 
-var server   = new Hapi.Server();
+var server   = new Hapi.Server( {
+	'debug' : {
+		'request' : [ 'error' ]
+	}
+} );
 
 var _error = Hapi.error;
 

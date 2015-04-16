@@ -2,6 +2,7 @@ var _        = require( 'lodash' );
 var mongoose = require( 'mongoose' );
 
 var User = _.extend( {
+
 	'email' : {
 		'type'     : String,
 		'required' : true,
@@ -10,6 +11,7 @@ var User = _.extend( {
 			'unique' : true
 		}
 	},
+
 	/**
 	 * At least one upper case english letter
 	 * At least one lower case english letter
@@ -41,4 +43,4 @@ var User = _.extend( {
 
 } );
 
-module.exports = new mongoose.Schema(User);
+module.exports = new mongoose.Schema( User );

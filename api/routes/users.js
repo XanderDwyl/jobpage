@@ -1,7 +1,9 @@
 'use strict';
+var Hapi     = require( 'hapi' );
 var mongoose = require( 'mongoose' );
 var User     = mongoose.model( 'User' );
-var Hapi     = require( 'hapi' );
+var Joi      = require( 'joi' );
+var _        = require( 'lodash' );
 
 var _error = Hapi.error;
 
@@ -10,16 +12,14 @@ module.exports = [
 		'method'  : 'GET',
 		'path'    : '/v1/users',
 		'handler' : function ( request, reply ) {
-			var user = {
-				'email' : 'sample',
-				'meta'  : {
-					'firstname' : 'sample',
-					'lastname'  : 'elpmas'
+
+			User.find( function ( err, users ) {
+				if ( err ) {
+					return reply( err );
 				}
-			};
 
-			reply( user );
-
+				reply( users );
+			} );
 		},
 
 		'config' : {
@@ -29,37 +29,88 @@ module.exports = [
 	},
 
 	{
-		'method' : 'POST',
-		'path'   : '/v1/users',
+		'method'  : 'GET',
+		'path'    : '/v1/users/{id}',
+		'handler' : function ( request, reply ) {
 
-		handler : function ( request, reply ) {
-
-			var credentials = {
-				email    : request.payload.email,
-				password : request.payload.password
-			};
-
-			if ( !credentials.email || !credentials.password ) {
-				return reply( _error.badRequest( 'Email and Password required.' ) );
-			}
-
-			var newUser = new User( credentials );
-
-			newUser.save( function ( error, user ) {
-				console.log( error.message );
-				if ( error ) {
-					var message = 'Registration problem. Try again later.';
-
-					if ( error.message.match( /duplicate/i ) ) {
-						message = 'Email already registered.';
-					}
-
-					var err = _error.badRequest( message );
+			User.findById( request.params.id, function ( err, users ) {
+				if ( err ) {
 					return reply( err );
 				}
-			} );
-			reply( 'add user' );
 
+				if ( !users ) {
+					return reply( err ).code( 400 );
+				}
+
+				reply( users );
+			} );
+
+		},
+
+		'config' : {
+			'description' : 'Display single user.',
+			'tags'        : [ 'api', 'user' ],
+			'validate'    : {
+				'params' : {
+					'id' : Joi.string()
+					.required()
+					.description( 'get User by id' )
+				}
+			}
+		}
+	},
+
+	{
+		'method'  : 'POST',
+		'path'    : '/v1/users',
+		'handler' : function ( request, reply ) {
+			var payload = request.payload;
+
+			var user = new User( payload );
+			user.save( function ( error, result ) {
+				var errMsg  = error && error.message;
+				var message = errMsg || 'There something wrong with the server, please try again later.';
+				var subMsg  = [];
+
+				if ( errMsg && errMsg.match( /duplicate/i ) ) {
+					message = 'Email already registered.';
+				}
+
+				if ( errMsg && errMsg.match( /validation/i ) ) {
+					var errFields = _.keys( error.errors );
+
+					for ( var i = 0; i < errFields.length; i++ ) {
+						subMsg.push( error.errors[ errFields[ i ] ].message );
+					}
+
+				}
+
+				if ( error ) {
+					return reply( {
+						'msg'        : message,
+						'subMsg'     : subMsg,
+						'statusCode' : 400
+					} );
+				}
+
+				reply( {
+					'id'    : result._id,
+					'email' : result.email,
+					'msg'   : 'User is successfully created.'
+				} );
+			} );
+		},
+
+		'config' : {
+			'description' : 'create new user.',
+			'tags'        : [ 'api', 'user' ],
+			'validate'    : {
+				'payload' : {
+					'email'    : Joi.string().required().description( 'set Email Address' ),
+					'password' : Joi.string().required().description( 'set User Password' )
+				}
+			}
 		}
 	}
+
 ];

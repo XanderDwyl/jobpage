@@ -13,7 +13,7 @@ describe( 'DB schema - /db/schema', function () {
 			expect( field ).to.have.property( 'role' );
 			expect( field ).to.have.property( 'meta' );
 		} );
-		describe('email field', function () {
+		describe( 'email field', function () {
 			var email = 'sample@gmail.com';
 			it( 'expect field to be unique', function () {
 				expect( field.email.index.unique ).to.equal( true );
@@ -27,8 +27,8 @@ describe( 'DB schema - /db/schema', function () {
 			it( 'expect input type to be string', function () {
 				expect( field.email.type ).to.equal( String );
 			} );
-		});
-		describe('password field', function () {
+		} );
+		describe( 'password field', function () {
 			var password = 'Sample99%';
 			it( 'expect field type to be string', function () {
 				expect( field.password.type ).to.equal( String );
@@ -42,8 +42,8 @@ describe( 'DB schema - /db/schema', function () {
 			it( 'expect fields to be unselected in query result', function () {
 				expect( field.password.select ).to.equal( false );
 			} );
-		});
-		describe('role field', function () {
+		} );
+		describe( 'role field', function () {
 			it( 'expect field type to be string', function () {
 				expect( field.role.type ).to.equal( String );
 			} );
@@ -52,9 +52,9 @@ describe( 'DB schema - /db/schema', function () {
 			} );
 			it( 'expect fields to be unselected in query result', function () {
 				expect( field.role.select ).to.equal( false );
-			});
-		});
-		describe('meta field', function () {
+			} );
+		} );
+		describe( 'meta field', function () {
 			it( 'expect field type to be an object', function () {
 				expect( field.meta.type ).to.equal( Object );
 			} );
@@ -62,6 +62,6 @@ describe( 'DB schema - /db/schema', function () {
 				expect( field.meta.default ).to.be.instanceof( Object );
 				expect( field.meta.default ).to.have.all.keys( 'firstName', 'lastName', 'birthday' );
 			} );
-		});
+		} );
 	} );
 } );

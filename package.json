@@ -17,11 +17,15 @@
     "fs": "0.0.2",
     "hapi": "^8.4.0",
     "hapi-swagger": "^0.7.3",
+    "hapi-swaggered": "^2.0.0-alpha.4",
+    "hapi-swaggered-ui": "^1.2.3",
+    "joi": "^6.1.1",
     "jscs": "^1.12.0",
     "jshint": "^2.6.3",
     "lodash": "^3.6.0",
     "mongoose": "^4.0.1",
-    "path": "^0.11.14"
+    "path": "^0.11.14",
+    "swagger-ui": "^2.1.0-M2"
   },
   "devDependencies": {
     "chai": "^2.2.0",
@@ -32,6 +36,7 @@
     "gulp-jshint": "^1.10.0",
     "gulp-mocha": "^2.0.1",
     "gulp-param": "^0.6.3",
-    "jshint-stylish": "^1.0.1"
+    "jshint-stylish": "^1.0.1",
+    "sinon": "^1.14.1"
   }
 }

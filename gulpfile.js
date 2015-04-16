@@ -7,6 +7,7 @@ var stylish  = require( 'jshint-stylish' );
 var mocha    = require( 'gulp-mocha' );
 var coverage = require( 'gulp-coverage' );
 var exit     = require( 'gulp-exit' );
+var exec     = require( 'child_process' ).exec;
 
 gulp.task( 'jslint', function () {
 	return gulp.src( [ './*.js', './test/**/*.js' ] )
@@ -22,7 +23,13 @@ gulp.task( 'eslint', function () {
 		.pipe( eslint.failOnError() );
 } );
 
-gulp.task( 'test', [ 'jslint', 'eslint' ], function ( pathSource, dontExit ) {
+gulp.task( 'dropDb', function () {
+	exec( 'make dropdb', function ( err ) {
+		return err;
+	} );
+} );
+
+gulp.task( 'test', [ 'jslint', 'eslint', 'dropDb' ], function ( pathSource, dontExit ) {
 
 	var sourceFile  = './test/**/*.js';
 	var processExit = '';
@@ -35,7 +42,7 @@ gulp.task( 'test', [ 'jslint', 'eslint' ], function ( pathSource, dontExit ) {
 		processExit = exit();
 	}
 
-	return gulp.src( './test/**/*.js', {
+	return gulp.src( sourceFile, {
 			'read' : false,
 			'base' : '/'
 		} )
